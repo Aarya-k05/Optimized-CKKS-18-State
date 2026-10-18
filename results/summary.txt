@@ -51,21 +51,21 @@ Final plaintext state: [ 2.93596582e-04 -6.16361335e-05  5.28482125e-04 -1.05372
   5.63714845e-04 -1.76485517e-05  3.58543510e-04  8.50026251e-05
   8.29882834e-05  2.03730135e-04 -2.34100488e-04  3.13672075e-04
  -5.59765565e-04  3.82797260e-04]
-Final encrypted-controller state: [ 2.93596140e-04 -6.16361596e-05  5.28481218e-04 -1.05372727e-04
-  6.60961820e-04 -1.16767419e-04  6.71324503e-04 -8.76241341e-05
-  5.63712601e-04 -1.76483215e-05  3.58540985e-04  8.50029148e-05
-  8.29855360e-05  2.03730219e-04 -2.34103627e-04  3.13672668e-04
- -5.59768403e-04  3.82792373e-04]
+Final encrypted-controller state: [ 2.93595893e-04 -6.16361415e-05  5.28480757e-04 -1.05372689e-04
+  6.60961191e-04 -1.16767370e-04  6.71323732e-04 -8.76241210e-05
+  5.63711654e-04 -1.76484571e-05  3.58539723e-04  8.50025505e-05
+  8.29837764e-05  2.03730048e-04 -2.34105666e-04  3.13671268e-04
+ -5.59772211e-04  3.82786476e-04]
 
 6. ACCURACY
-Maximum state error (full 18-dim vector norm): 1.329004604215e-06
-Maximum control error: 2.100095038315e-05
+Maximum state error (full 18-dim vector norm): 1.332437863906e-06
+Maximum control error: 2.146029024885e-05
 
 7. HE TIMING
-Average encryption: 0.789319 ms/step
-Average HE dot product: 7.025403 ms/step
-Average decryption: 0.518022 ms/step
-Total: 8.332743 ms/step
+Average encryption: 0.560090 ms/step
+Average HE dot product: 6.598247 ms/step
+Average decryption: 0.400501 ms/step
+Total: 7.558839 ms/step
 
 8. FILES
 control_data.csv      - combined numerical results (all masses)
