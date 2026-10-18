@@ -1,0 +1,86 @@
+========================================================================
+CKKS ENCRYPTED STATE-FEEDBACK CONTROL SYSTEM
+========================================================================
+
+1. PLANT
+9-mass chain: mass 1 anchored to a wall, mass 9
+driven by a single actuator; identical spring/damper between
+each neighbouring pair (m=1 kg, c=1.0 Ns/m, k=2 N/m).
+State vector (n=18): [pos1, vel1, pos2, vel2, ..., pos9, vel9]
+Open-loop poles:
+[-1.94581724+1.99926592j -1.94581724-1.99926592j -1.78914051+1.98885351j
+ -1.78914051-1.98885351j -1.54694816+1.94801027j -1.54694816-1.94801027j
+ -1.24548549+1.85221701j -1.24548549-1.85221701j -0.91742065+1.68167237j
+ -0.91742065-1.68167237j -0.59830458+1.42662186j -0.59830458-1.42662186j
+ -0.32271843+1.08936979j -0.32271843-1.08936979j -0.12052625+0.68379706j
+ -0.12052625-0.68379706j -0.0136387 +0.23317112j -0.0136387 -0.23317112j]
+
+2. CONTROLLER
+Control law: u(k) = -K x(k)   (single actuator, single gain row)
+Gain design: LQR (solve_continuous_are), not manual pole placement --
+a long single-actuator chain has very unevenly controllable modes,
+so hand-picked poles blow up the gain magnitude and hurt CKKS accuracy.
+K =
+[[ 0.9118 11.764   2.2289 22.8841  4.3273 32.6615  7.5283 40.2987 12.079  44.8737 18.1262 45.3254
+  25.6921 40.4364 35.2612 29.115  56.9094 15.5242]]
+
+Closed-loop poles (A-BK):
+[-7.7378886 +3.2979314j  -7.7378886 -3.2979314j  -1.94260712+1.9977307j
+ -1.94260712-1.9977307j  -1.77755856+1.98168768j -1.77755856-1.98168768j
+ -1.52538959+1.9289591j  -1.52538959-1.9289591j  -1.21757812+1.81362272j
+ -1.21757812-1.81362272j -0.89284994+1.6167794j  -0.89284994-1.6167794j
+ -0.21816716+0.54939229j -0.21816716-0.54939229j -0.59275232+1.33278092j
+ -0.59275232-1.33278092j -0.35730175+0.9720473j  -0.35730175-0.9720473j ]
+
+3. DISCRETIZATION
+Sampling time: 0.1 s
+Ad shape: (18, 18), Bd shape: (18, 1)
+
+4. CKKS CONFIGURATION
+Polynomial modulus degree: 8192
+Coefficient modulus bits: [60, 40, 60]
+Execution mode: precomp
+Global scale: 2^40
+Library: TenSEAL (Microsoft SEAL backend)
+
+5. SIMULATION
+Control cycles: 200
+Initial state: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0.]
+Final plaintext state: [ 2.93596582e-04 -6.16361335e-05  5.28482125e-04 -1.05372695e-04
+  6.60963213e-04 -1.16767427e-04  6.71326361e-04 -8.76242422e-05
+  5.63714845e-04 -1.76485517e-05  3.58543510e-04  8.50026251e-05
+  8.29882834e-05  2.03730135e-04 -2.34100488e-04  3.13672075e-04
+ -5.59765565e-04  3.82797260e-04]
+Final encrypted-controller state: [ 2.93596140e-04 -6.16361596e-05  5.28481218e-04 -1.05372727e-04
+  6.60961820e-04 -1.16767419e-04  6.71324503e-04 -8.76241341e-05
+  5.63712601e-04 -1.76483215e-05  3.58540985e-04  8.50029148e-05
+  8.29855360e-05  2.03730219e-04 -2.34103627e-04  3.13672668e-04
+ -5.59768403e-04  3.82792373e-04]
+
+6. ACCURACY
+Maximum state error (full 18-dim vector norm): 1.329004604215e-06
+Maximum control error: 2.100095038315e-05
+
+7. HE TIMING
+Average encryption: 0.789319 ms/step
+Average HE dot product: 7.025403 ms/step
+Average decryption: 0.518022 ms/step
+Total: 8.332743 ms/step
+
+8. FILES
+control_data.csv      - combined numerical results (all masses)
+execution_trace.csv   - step-by-step execution trace (all states)
+state_response.png    - state comparison (first/middle/last mass)
+control_signal.png    - control comparison
+error_vs_step.png     - CKKS numerical error
+timing_breakdown.png  - HE timing
+
+9. INTERPRETATION
+The controller computes the state-feedback dot product using
+a CKKS ciphertext and a plaintext gain vector. Only the resulting
+control signal is decrypted before it is applied to the simulated
+plant. The plaintext controller is retained as a baseline so the
+effect of CKKS approximation can be quantified. Note that the
+HE pipeline itself (encrypt -> homomorphic dot product -> decrypt)
+is unchanged from the 2-state version: TenSEAL's dot() already
+handles a 18-element vector the same way it handled a 2-element one.
